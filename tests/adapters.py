@@ -589,4 +589,12 @@ def run_train_bpe(
                 representing that <token1> was merged with <token2>.
                 Merges are ordered by order of creation.
     """
-    raise NotImplementedError
+    from cs336_basics.train_bpe import TokenizerTrainer
+
+    trainer = TokenizerTrainer(
+        input_path=str(input_path),
+        vocab_size=vocab_size,
+        special_tokens=special_tokens,
+        num_processes=kwargs.get("num_processes", 1),
+    )
+    return trainer.train_bpe()
