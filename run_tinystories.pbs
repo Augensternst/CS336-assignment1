@@ -1,0 +1,35 @@
+#!/bin/bash
+#PBS -N bpe_tinystories
+#PBS -l select=1:ncpus=32:mem=64G
+#PBS -l walltime=1:00:00
+#PBS -j oe
+#PBS -o tinystories_out.log
+#PBS -P personal-xuanhe00
+#PBS -q normal
+
+cd $PBS_O_WORKDIR
+export PATH="$HOME/.local/bin:$PATH"
+module load miniforge3
+
+uv run python -c "
+import time, pickle
+from cs336_basics.train_bpe import TokenizerTrainer
+
+t0 = time.time()
+trainer = TokenizerTrainer(
+    input_path='data/TinyStoriesV2-GPT4-train.txt',
+    vocab_size=10000,
+    special_tokens=['<|endoftext|>'],
+    num_processes=32,
+)
+vocab, merges = trainer.train_bpe()
+elapsed = time.time() - t0
+
+pickle.dump(vocab, open('out/tinystories/vocab.pkl', 'wb'))
+pickle.dump(merges, open('out/tinystories/merges.pkl', 'wb'))
+
+longest_id, longest_bytes = max(vocab.items(), key=lambda kv: len(kv[1]))
+print(f'耗时 {elapsed:.1f}s')
+print(f'词表大小 {len(vocab)}, merges数 {len(merges)}')
+print(f'最长token: {longest_bytes!r}')
+"
