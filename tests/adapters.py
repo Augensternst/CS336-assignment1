@@ -113,7 +113,9 @@ def run_scaled_dot_product_attention(
     Returns:
         Float[Tensor, " ... queries d_v"]: Output of SDPA
     """
-    raise NotImplementedError
+    from cs336_basics.attention_core import scaled_dot_product_attention
+
+    return scaled_dot_product_attention(Q, K, V, mask)
 
 
 def run_multihead_self_attention(
@@ -209,7 +211,12 @@ def run_rope(
     Returns:
         Float[Tensor, " ... sequence_length d_k"]: Tensor with RoPEd input.
     """
-    raise NotImplementedError
+    from cs336_basics.attention_core import RotaryPositionalEmbedding
+
+    rope = RotaryPositionalEmbedding(
+        theta=theta, d_k=d_k, max_seq_len=max_seq_len, device=in_query_or_key.device
+    )
+    return rope(in_query_or_key, token_positions)
 
 
 def run_transformer_block(
